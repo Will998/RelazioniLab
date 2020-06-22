@@ -88,13 +88,37 @@ L'uscita $Q_B$ invece fa scaricare lievemente il condensatore, in quanto gli imp
 \end{figure}
 \paragraph{Questa presenta due poli immaginari nell'origine, rendendo così il sistema instabile. A questo punto per ovviare a questo problema si deve per forza di cose aggiungere uno zero in zero alla funzione di trasferimento, aggiungendo un resistore prima del condensatore.
 Il fattore di smorzamento diventa >0 , il margine di fase che in precedenza era nullo, ora anch'esso è aumentato.  
-Questo non è l'unico aspetto positivo di questa realizzazione, perché anche all'aumentare del guadagno, abbiamo che il margine di fase aumenta ulteriormente di conseguenza (Figura 9).}
+Questo non è l'unico aspetto positivo di questa realizzazione, perché anche all'aumentare del guadagno, abbiamo che il margine di fase aumenta ulteriormente di conseguenza (Figura 9), migliorando la stabilità.}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=0.8]{ZPFD.png} 
 \caption{Il margine di fase aumenta}
 \label{fig:foo}
 \end{figure}
+\paragraph{A questo punto possiamo inserire un divisore di frequenza.}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.6]{DivM.png} 
+\caption{PLL con pompa di carico e divisore per M}
+\label{fig:foo}
+\end{figure}
+\paragraph{Per completare il nostro progetto bisognerà dimensionare $I_P,R_1,C_1$, il $K_VCO$ sarà noto in quanto parametro di costruzione.
+Con l'inserimento del divisore per e portando la nuova $H(S)$ nella forma "canonica" abbiamo $\zeta=\frac{R_1}{2}\sqrt{\frac{I_P K_{VCO}C_1}{2\pi M}}$ e }
 
+$\omega _n= \sqrt  {   \frac{I_pK_{VCO}C_1}{2\pi M}   }$ 
+
+\paragraph{Per il nostro progetto dovremo tenere conto delle richieste che sono:$f_{OUT}=1 MHz$\\$f_{REF}=10 kHz$\\$M=100 (80\div150)$.\\Il VCO che utilizzeremo sarò il 74LS624.}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=1]{74LS.png} 
+\centering
+\caption{Pinout del VCO}
+\label{fig:foo}
+\end{figure}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.4]{SCH.png} 
+\centering
+\caption{Schema a blocchi dei dispositivi da realizzare.}
+\label{fig:foo}
+\end{figure}
+\paragraph{Il divisore per M, realizzato sull'FPGA, presenterà uno dip switch, da 8 interruttori, per selezionare il numero M. Il DIP switch verrà collegato a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V)}
 \newpage
 \section{Realizzazione}
 \paragraph{Viene descritto come si è realizzato il sistema finale (tramite simulatore o come realizzazione pratica)}

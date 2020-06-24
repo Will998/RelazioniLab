@@ -111,18 +111,21 @@ Per dimensionare $C_1$ andremo a prendere la formula del fattore di smorzamento 
 \caption{PLL con pompa di carico e divisore per M}
 \label{fig:foo}
 \end{figure}
-\paragraph{Il $K_VCO$ sarà noto in quanto parametro di costruzione.
+\paragraph{Il $K_{VCO}$ sarà noto in quanto parametro di costruzione.
 Con l'inserimento del divisore per M abbiamo $\omega _n=\sqrt{\frac{I_p K_{VCO}}{2 \pi C_1M} }$ e $\zeta=\frac{R_1}{2}\sqrt{\frac{I_p K_{VCO}C_1}{2\pi M}}$ a questo punto possiamo andare a dimensionare $C_1$ sapendo che\\ $\zeta \approx0.8 \div 1$, $K_{VCO}\approx800$ per $C_{EXT}=120pF$, $I_P=60\mu A$ e $M=100$.
 Ponendo $\zeta \approx0.94$ otteniamo una capacità $C_1=1\mu F$  }
  
 
-\paragraph{Per il nostro progetto dovremo tenere conto delle richieste che sono:$f_{OUT}=1 MHz$\\$f_{REF}=10 kHz$\\$M=100 (80\div150)$.\\Il VCO che utilizzeremo sarò il 74LS624.}
+\paragraph{Per il nostro progetto dovremo tenere conto delle richieste che sono:\\$f_{OUT}=1 MHz$\\$f_{REF}=10 kHz$\\$M=100 (80\div150)$.\\Il VCO che utilizzeremo sarà il 74LS624, sono presenti due alimentazioni separate, una per la parte logica ed una per la parte di oscillazione, perché il costruttore ci dice che per frequenze > 10MHz è consigliato l'utilizzo di alimentazioni separate, in modo tale che i rumori proveniente dalla parte logica non influiscano sulla frequenza di oscillazione, infatti se la tensione di alimentazione avesse delle lievi oscillazioni la frequenza di lavoro cambierebbe.
+Tuttavia, nel nostro caso, utilizzeremo una singola alimentazione.}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=1]{74LS.png} 
 \centering
 \caption{Pinout del VCO}
 \label{fig:foo}
 \end{figure}
+\paragraph{Come si diceva prima, si vedono infatti i pin delle due alimentazioni separate(1-14, 7-9), il piedino di enable, nel nostro caso, lo lasciamo sempre collegato a GND per farlo lavorare ogni volta che il VCO è alimentato.
+Il piedino 13 è quello di ingresso della tensione di controllo che proviene da un buffer, il motivo per cui è stato inserito un buffer tra il LPF e il VCO è che dal piedino di input ci sono delle resistenze che potrebbero costituire un carico non trascurabile, pertanto inserendo un buffer realizzato con un amplificatore operazionale andremo ad ovviare a questo problema..}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=0.4]{SCH.png} 
 \centering
@@ -131,6 +134,23 @@ Ponendo $\zeta \approx0.94$ otteniamo una capacità $C_1=1\mu F$  }
 \end{figure}
 \paragraph{Il divisore per M, realizzato sull'FPGA, presenterà uno dip switch, da 8 interruttori, per selezionare il numero M. Il DIP switch verrà collegato a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre, se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V).
 $C_{EXT}=120pF$}
+\paragraph{A questo punto l'uscita del VCO avrà un'uscita massima > 4V e dobbiamo portarlo in un range tale da poterlo usare come ingresso al divisore, quindi alla FPGA, per cui dobbiamo utilizzare un Level Shifter per portarlo a 3.3V.}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.7]{Level.png} 
+\centering
+\caption{Level Shifter}
+\label{fig:foo}
+\end{figure}
+\paragraph{Lo scopo di questo blocco è quindi quello di traslare il livello logico 1 dal valore che ci dava il VCO (>4V) a 3.3V, mediante l'utilizzo di un transistore NPN 2N2222 (o similare).\\
+Lo schema a blocchi finale è quindi il seguente:}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.4]{PLL_1.png} 
+\centering
+\caption{Schema a blocchi dei dispositivi da realizzare.}
+\label{fig:foo}
+\end{figure}
+
+
 \newpage
 \section{Realizzazione}
 \paragraph{Viene descritto come si è realizzato il sistema finale (tramite simulatore o come realizzazione pratica)}

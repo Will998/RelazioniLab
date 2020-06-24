@@ -59,7 +59,7 @@ Nell'istante $t_{0}$ la frequenza del segnale d'ingresso cambia, il periodo dell
 \label{fig:foo}
 \end{figure}
 \paragraph{Abbiamo la proporzionalità data dal PD, un polo dato dal LPF ed infine l'integratore che rappresenta il VCO. Possiamo calcolare le funzioni di trasferimento, sia ad anello aperto, sia ad anello chiuso ottenendo:\\$H_{0}(s)=K_{PD}\frac{1}{1+\frac{s}{\omega _{LPF}}}\frac{K_{VCO}}{s}$   e   $H(s)=\frac{K_{PD}K_{VCO}}{\frac{s^{2}}{\omega_{LPF}}}+s+K_{PD}K_{VCO}$}
-\paragraph{Quanto detto fin'ora però presenta un problema: abbiamo\\ $\omega_{LPF}<<\omega_{IN}-\omega_{OUT}$, pertanto la differenza non riesce a passare nel LPF e il circuito non riesce ad agganciarsi. Per il nostro progetto quindi avremmo bisogno di un rivelatore che non tenga conto solo della fase ma anche delal frequenza: PFD (Phase-Frequency Detector, Figura 5).}
+\paragraph{Quanto detto fin'ora però presenta un problema: abbiamo\\ $\omega_{LPF}<<\omega_{IN}-\omega_{OUT}$, pertanto la differenza non riesce a passare nel LPF e il circuito non riesce ad agganciarsi. Per il nostro progetto quindi avremmo bisogno di un rivelatore che non tenga conto solo della fase ma anche della frequenza: PFD (Phase-Frequency Detector, Figura 5).}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=0.4]{PFD2.png} 
 \caption{Schema di un PFD}
@@ -94,16 +94,27 @@ Questo non è l'unico aspetto positivo di questa realizzazione, perché anche al
 \caption{Il margine di fase aumenta}
 \label{fig:foo}
 \end{figure}
+\paragraph{Nella Figura 8 possiamo vedere che sarebbero necessari due generatori di corrente(ideali).
+Ovviamente non possiamo avere dei generatori ideali, quindi approssimeremo i due generatori come due generatori reali, quindi con una $r_p$ in parallelo al generatore, che possiamo trasformarlo in un equivalente Thevenin quindi con la $r_p$ in serie.
+A questo punto possiamo utilizzare due buffer Three-state, uno con ingresso a 1, l'altro con l'ingresso a 0. Collegando le due uscite $Q_A e Q_B$ del PFD agli input enable dei due buffer, avremo una approssimazione dei nostri due generatori (Figura 13). In serie alle due uscite dei buffer andremo poi ad inserire due resistenze $R_{P1}$ e  $R_{P2}$ che sarebbero quelle dei generatori reali.}
+~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.8]{CPDeeds.png} 
+\centering
+\caption{Realizzazione su Deeds dei due generatori di corrente}
+\label{fig:foo}
+\end{figure}
+\paragraph{Il segnale $CP1$ e $CP2$ sono le uscite effettive della pompa di carico che andranno sul LPF, mentre le due uscite LED0 e LED1 sono state inserite per vedere i led della FPGA quando il nostro sistema sta modificando la frequenza di oscillazione. Ci sono infinite soluzioni per dimensionare i componenti necessari in questo blocco del nostro sistema, in questo caso $R_{P1}$ e  $R_{P2}$ sono state scelte pari a $27k\Omega$ quindi le correnti che scorrono nei due rami sono $I_1=I_2=\frac{V_{DD}-V{CONT}}{R_{P1}}$ essendo $V{CONT}=V_{DD}/2$ $I_1=I_2=60\mu A$. A questo punto dovremmo scegliere una $R_1$ (quella del LPF) di valore significativamente più bassa delle due appena scelte, pertanto scegliamo $R_1=\frac{R_{P1}}{10}=2.7k\Omega$.
+Per dimensionare $C_1$ andremo a prendere la formula del fattore di smorzamento $\zeta$ che vedremo in seguito, dopo aver aggiunto il divisore per M, e lo porremo uguale a 0.8/1 che ci poterà alla stabilità del sistema. }
 \paragraph{A questo punto possiamo inserire un divisore di frequenza.}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=0.6]{DivM.png} 
 \caption{PLL con pompa di carico e divisore per M}
 \label{fig:foo}
 \end{figure}
-\paragraph{Per completare il nostro progetto bisognerà dimensionare $I_P,R_1,C_1$, il $K_VCO$ sarà noto in quanto parametro di costruzione.
-Con l'inserimento del divisore per e portando la nuova $H(S)$ nella forma "canonica" abbiamo $\zeta=\frac{R_1}{2}\sqrt{\frac{I_P K_{VCO}C_1}{2\pi M}}$ e }
-
-$\omega _n= \sqrt  {   \frac{I_pK_{VCO}C_1}{2\pi M}   }$ 
+\paragraph{Il $K_VCO$ sarà noto in quanto parametro di costruzione.
+Con l'inserimento del divisore per M abbiamo $\omega _n=\sqrt{\frac{I_p K_{VCO}}{2 \pi C_1M} }$ e $\zeta=\frac{R_1}{2}\sqrt{\frac{I_p K_{VCO}C_1}{2\pi M}}$ a questo punto possiamo andare a dimensionare $C_1$ sapendo che\\ $\zeta \approx0.8 \div 1$, $K_{VCO}\approx800$ per $C_{EXT}=120pF$, $I_P=60\mu A$ e $M=100$.
+Ponendo $\zeta \approx0.94$ otteniamo una capacità $C_1=1\mu F$  }
+ 
 
 \paragraph{Per il nostro progetto dovremo tenere conto delle richieste che sono:$f_{OUT}=1 MHz$\\$f_{REF}=10 kHz$\\$M=100 (80\div150)$.\\Il VCO che utilizzeremo sarò il 74LS624.}
 ~\begin{figure}[!h]%Risposta al gradino
@@ -118,7 +129,8 @@ $\omega _n= \sqrt  {   \frac{I_pK_{VCO}C_1}{2\pi M}   }$
 \caption{Schema a blocchi dei dispositivi da realizzare.}
 \label{fig:foo}
 \end{figure}
-\paragraph{Il divisore per M, realizzato sull'FPGA, presenterà uno dip switch, da 8 interruttori, per selezionare il numero M. Il DIP switch verrà collegato a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V)}
+\paragraph{Il divisore per M, realizzato sull'FPGA, presenterà uno dip switch, da 8 interruttori, per selezionare il numero M. Il DIP switch verrà collegato a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre, se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V).
+$C_{EXT}=120pF$}
 \newpage
 \section{Realizzazione}
 \paragraph{Viene descritto come si è realizzato il sistema finale (tramite simulatore o come realizzazione pratica)}

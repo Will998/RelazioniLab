@@ -10,7 +10,7 @@
 \title{Sintetizzatore di Frequenza}
 \author{William Perri 4427140 }
 \setlength{\parskip}{1em}
-\renewcommand{\baselinestretch}{1.8}
+\renewcommand{\baselinestretch}{1}
 %\DeclareGraphicsExtensions{.jpeg,.png}
 \date{20/06/2020}
 
@@ -181,16 +181,66 @@ Lo schema del circuito realizzato su breadboard è il seguente:}
 \label{fig:foo}
 \end{figure}
 
+ ~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.3]{Circuito.png} 
+\centering
+\caption{Realizzazione Pratica}
+\label{fig:foo}
+\end{figure}
 \newpage
 \section{Risultati}
 \paragraph{Per visualizzare l'onda d'uscita si è utilizzato il software SoundScope che, interfacciandosi con la scheda audio del computer, mostra la forma d'onda in ingresso sul canale microfono. Di seguito vengono riportati diverse uscite al variare di M}
+\subsection{Screenshot dell'oscilloscopio}
 
-\newpage
+\begin{figure}[H]
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m80}
+     \caption{M=80 - Dominio del tempo}\label{Fig:Data1}
+   \end{minipage}\hfill
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m80f}
+     \caption{M=80 - Dominio delle frequenze}\label{Fig:Data2}
+   \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m100}
+     \caption{M=100 - Dominio del tempo}\label{Fig:Data1}
+   \end{minipage}\hfill
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m100f}
+     \caption{M=100 - Dominio delle frequenze}\label{Fig:Data2}
+   \end{minipage}
+\end{figure}
+\begin{figure}[H]
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m126}
+     \caption{M=126 - Dominio del tempo}\label{Fig:Data1}
+   \end{minipage}\hfill
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=1\linewidth]{m126f}
+     \caption{M=126 - Dominio delle frequenze}\label{Fig:Data2}
+   \end{minipage}
+\end{figure}
+
+
+
 \section{Conclusioni}
 \paragraph{Per concludere, si è prima realizzata la parte su FPGA e verificato il suo corretto sviluppo mediante test con segnali noti, solo in seguito è stata realizzata la parte su bread-board dopo aver opportunamente dimensionato i componenti(vedi capitolo 2).
 Si è utilizzato il software SoundScope per visualizzare a schermo l'onda d'uscita, la frequenza e l'analisi spettrale.}
 
 \newpage
 \section{Riferimenti}
-\paragraph{Contiene  sia  la  bibliografia  (libri,  articoli,  manuali)  sia  i  siti  web  eventualmente  impiegati  durante il progetto}
+\paragraph{Alcune immagini e schemi circuitali sono stati presi da: }
+\begin{itemize}
+\item Design of CMOS Phase-Locked Loops - B. Razavi
+\item RF Microelectronics - B. Razavi
+\end{itemize}
 \end{document}

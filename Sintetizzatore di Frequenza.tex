@@ -151,21 +151,44 @@ Lo schema a blocchi completo di ogni componente è quindi il seguente:}
 
 \newpage
 \section{Realizzazione}
-\paragraph{La prima cosa fatta per realizzare il nostro sintetizzatore è stata partire dall'implementare sul Digital Electronics Deeds tutte le componenti che dovranno poi essere messe sulla FPGA Cyclone II.}
+La realizzazione pratica è quindi suddivisa in due step, il primo su Deeds ed il secondo su breadboard.
+\subsection{Parte su Deeds}
+\paragraph{La prima cosa fatta per realizzare il sintetizzatore è stata partire dall'implementare sul Digital Electronics Deeds tutte le componenti che dovranno poi essere messe sulla FPGA Cyclone II.}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=4.4]{Fig_Finale.png} 
 \centering
 \caption{Schema realizzato su Deeds}
 \label{fig:foo}
 \end{figure}
+\paragraph{In azzurro c'è il rilevatore di frequenza e fase, le cui uscite vanno alla pompa di carica (in verde).\\In Giallo e in rosso possiamo vedere i due divisori, realizzati con due contatori.
+A sinistra c'è il divisore per mille, realizzato caricando il numero $000111110011$ ovvero 499, siccome conta fino a zero, impiegano 500 cicli di clock per arrivare a zero, il filp-flop JK nella configurazione in figura ha il compito di dividere ulteriormente a metà la frequenza, ottenendo così il desiderato divisore per mille.\\
+Con lo stesso principio, in rosso, abbiamo il divisore per M variabile, il numero M viene scelto mediante gli switch in alto.
+L'ingresso di entrambi i divisori è ovviamente l'uscita del level shifter realizzato su breadboard come spiegato nel capitolo precedente.\\L'uscita finale è l'uscita Q del Flip Flop JK e il clock in alto a sinistra è la frequenza di riferimento.\\Mediante il software Quartus II, il progetto è stato esportato sulla FPGA, assegnando ad ogni Ingresso/uscita utile un suo pin da collegare poi alla breadboard.}
+ \subsection{Parte su bread-board}
+ \paragraph{Per il nostro progetto c'era bisogno di interfacciare la parte software con quella hardware, come detto prima sono stati assegnati i pin della FPGA nel modo seguente:}
+ ~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.6]{PinDeeds.png} 
+\centering
+\caption{Assegnazione dei pin}
+\label{fig:foo}
+\end{figure}
+\paragraph{Il clear è stato messo sul push button della FPGA, i PIN dal 48 al 70 sono stati usati per collegare i dip switches alla FPGA, e l'uscita del level shifter (che andrà ai due divisori) è stato assegnato al pin 142. Su ogni componente sono stati messi dei condensatori di bypass sulle alimentazioni per ridurre al minimo le oscillazioni che la tensione di alimentazione potrebbe avere.
+Lo schema del circuito realizzato su breadboard è il seguente:}
+ ~\begin{figure}[!h]%Risposta al gradino
+\includegraphics[scale=0.35]{SchemaCirc.png} 
+\centering
+\caption{Schema circuitale realizzato}
+\label{fig:foo}
+\end{figure}
 
 \newpage
 \section{Risultati}
-\paragraph{Sono  raccolti  di  risultati  più  significativi,  intesi  come  prestazioni  del  circuito  finale,  in  modo  sufficiente per poterlo caratterizzare adeguatamente}
+\paragraph{Per visualizzare l'onda d'uscita si è utilizzato il software SoundScope che, interfacciandosi con la scheda audio del computer, mostra la forma d'onda in ingresso sul canale microfono. Di seguito vengono riportati diverse uscite al variare di M}
 
 \newpage
 \section{Conclusioni}
-\paragraph{Si riassumono i punti salienti del progetto svolto}
+\paragraph{Per concludere, si è prima realizzata la parte su FPGA e verificato il suo corretto sviluppo mediante test con segnali noti, solo in seguito è stata realizzata la parte su bread-board dopo aver opportunamente dimensionato i componenti(vedi capitolo 2).
+Si è utilizzato il software SoundScope per visualizzare a schermo l'onda d'uscita, la frequenza e l'analisi spettrale.}
 
 \newpage
 \section{Riferimenti}

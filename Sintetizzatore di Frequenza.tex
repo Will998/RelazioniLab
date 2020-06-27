@@ -53,7 +53,8 @@ Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Vo
 \label{fig:foo}
 \end{figure}
 \paragraph{Analizzando la Figura 3, possiamo capire che se la tensione in uscita dal VCO è nulla (o al valore di riferimento), esso oscillerà ad una frequenza $\omega _{0}$, per modificare questa frequenza c'è necessità di cambiare la tensione di controllo $V_{CONT}$ in uscita dal LPF, la differenza di fase tra $V_{IN}$ e $V_{OUT}$ permette a $V_{PD}$ di generare un $\Delta V$ per modificare la frequenza del VCO. Il LPF deve "pulire" la tensione di controllo dai piccoli picchi che la tensione $V_{PD}$ avrebbe. 
-Nell'istante $t_{0}$ la frequenza del segnale d'ingresso cambia, il periodo della Vin diminuisce, l'impulso VPD si allarga facendo aumentare $V_{CONT}$, all'istante $t_{a}$, a causa delle dinamiche dell'anello, la tensione $V_{CONT}$ continua a salire, facendo aumentare conseguentemente la frequenza di oscillazione del VCO, fino a quando non si stabilizzerà a $\omega _{1}$ all'istante $t_{2}$.\\Andando ad esplicitare il LPF come un filtro del primo ordine, otteniamo quanto segue in Figura 4}
+Nell'istante $t_{0}$ la frequenza del segnale d'ingresso cambia, il periodo della Vin diminuisce, l'impulso VPD si allarga facendo aumentare $V_{CONT}$.
+\\All'istante $t_{a}$, a causa delle dinamiche dell'anello, la tensione $V_{CONT}$ continua a salire, facendo aumentare conseguentemente la frequenza di oscillazione del VCO, fino a quando non si stabilizzerà a $\omega _{1}$ all'istante $t_{2}$.\\Andando ad esplicitare il LPF come un filtro del primo ordine, otteniamo quanto segue in Figura 4}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=1.5]{Esplicitato.png} 
 \caption{}
@@ -82,7 +83,7 @@ Questo dispositivo è stato implementato come si può vedere in Figura 6.
 \caption{Rappresentazione simbolica della Charge Pump}
 \label{fig:foo}
 \end{figure}
-\paragraph{Se $Q_A$ è a 1, chiude lo switch $S_1$, facendo caricare il condensatore $C_1$, facendo aumentare la frequenza del VCO.
+\paragraph{Se $Q_A$ è a 1, chiude lo switch $S_1$, facendo caricare il condensatore $C_1$ e di conseguenza aumentare la frequenza del VCO.
 L'uscita $Q_B$ invece fa scaricare lievemente il condensatore, in quanto gli impulsi di $Q_B$ sono molto più stretti di quelli di $Q_A$, il condensatore $C_1$ sostituisce anche il LPF, generando però un problema, la nuova funzione di trasferimento è $H(S)=\frac{I_PK_{VCO}}{2\pi C_1S^2+I_PK_{VCO}}$}
 
 \paragraph{Questa presenta due poli immaginari nell'origine, rendendo così il sistema instabile. A questo punto per ovviare a questo problema si deve  aggiungere uno zero in zero alla funzione di trasferimento, aggiungendo un resistore prima del condensatore.
@@ -131,7 +132,7 @@ Il piedino 13 è quello di ingresso della tensione di controllo che proviene da 
 \caption{Schema a blocchi dei dispositivi da realizzare.}
 \label{fig:foo}
 \end{figure}
-\paragraph{Il divisore per M, realizzato sull'FPGA, presenterà uno dip switch, da 8 interruttori, per selezionare il numero M. Il DIP switch verrà collegato a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre, se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V).}
+\paragraph{Il divisore per M, realizzato sull'FPGA, presenterà 8 dip switches per selezionare il numero M. Essi verranno collegati a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre, se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V).}
 \paragraph{A questo punto l'uscita del VCO avrà un'uscita massima \textgreater 4V e dobbiamo portarlo in un range tale da poterlo usare come ingresso al divisore, quindi alla FPGA, per cui dobbiamo utilizzare un Level Shifter per portarlo a 3.3V.}
 ~\begin{figure}[!h]%Risposta al gradino
 \includegraphics[scale=0.7]{Level.png} 
@@ -238,7 +239,6 @@ Si è utilizzato il software SoundScope per visualizzare a schermo l'onda d'usci
 
 \newpage
 \section{Riferimenti}
-\paragraph{Alcune immagini e schemi circuitali sono stati presi da: }
 \begin{itemize}
 \item Design of CMOS Phase-Locked Loops - B. Razavi
 \item RF Microelectronics - B. Razavi

@@ -1,10 +1,14 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{imakeidx}
 \usepackage[italian]{babel}
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \makeindex
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage[margin=1in]{geometry}
 \usepackage{float}
 %\graphicspath{}
 \title{Sintetizzatore di Frequenza}
@@ -23,9 +27,9 @@ Insegnamento di LABORATORIO DI ELETTRONICA A.A. 2019/20
 \tableofcontents
 \newpage
 \section{Introduzione}
-\paragraph{Lo scopo del progetto consiste nel realizzare un sintetizzatore di frequenza basato su PLL (Phase Locked Loop).
-Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Voltage Controlled Oscillator).}
-\paragraph{ Il progetto verrà dapprima simulato mediante software di simulazione ed in seguito realizzato in parte su breadboard ed in parte su una FPGA (Field Programmable Gate Array) Cyclone II, programmata mediante il software Quartus II sulla base del progetto realizzato su Digital Electronic Deeds.}
+Lo scopo del progetto consiste nel realizzare un sintetizzatore di frequenza basato su PLL (Phase Locked Loop).
+Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Voltage Controlled Oscillator).\\
+ Il progetto verrà dapprima simulato mediante software di simulazione ed in seguito realizzato in parte su breadboard ed in parte su una FPGA (Field Programmable Gate Array) Cyclone II, programmata mediante il software Quartus II sulla base del progetto realizzato su Digital Electronic Deeds.
 
 
 \newpage
@@ -33,7 +37,7 @@ Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Vo
 
 \paragraph{Come già detto nel capitolo precedente, il nostro sintetizzatore si baserà su un PLL il cui schema a blocchi è il seguente:\\ }
 
-~\begin{figure}[!h]%Schema a blocchi PLL
+~\begin{figure}[H]%Schema a blocchi PLL
 \includegraphics[scale=1.4]{PLLSchema.png} 
 \caption{Schema a Blocchi PLL}
 \label{fig:foo}
@@ -47,7 +51,7 @@ Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Vo
 
 
 
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.6]{PLLGradino.png} 
 \caption{Risposta ad un gradino in frequenza}
 \label{fig:foo}
@@ -55,14 +59,14 @@ Un PLL è composto da un rivelatore di fase, un filtro passa-basso ed un VCO (Vo
 \paragraph{Analizzando la Figura 3, possiamo capire che se la tensione in uscita dal VCO è nulla (o al valore di riferimento), esso oscillerà ad una frequenza $\omega _{0}$, per modificare questa frequenza c'è necessità di cambiare la tensione di controllo $V_{CONT}$ in uscita dal LPF, la differenza di fase tra $V_{IN}$ e $V_{OUT}$ permette a $V_{PD}$ di generare un $\Delta V$ per modificare la frequenza del VCO. Il LPF deve "pulire" la tensione di controllo dai piccoli picchi che la tensione $V_{PD}$ avrebbe. 
 Nell'istante $t_{0}$ la frequenza del segnale d'ingresso cambia, il periodo della Vin diminuisce, l'impulso VPD si allarga facendo aumentare $V_{CONT}$.
 \\All'istante $t_{a}$, a causa delle dinamiche dell'anello, la tensione $V_{CONT}$ continua a salire, facendo aumentare conseguentemente la frequenza di oscillazione del VCO, fino a quando non si stabilizzerà a $\omega _{1}$ all'istante $t_{2}$.\\Andando ad esplicitare il LPF come un filtro del primo ordine, otteniamo quanto segue in Figura 4}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=1.5]{Esplicitato.png} 
 \caption{}
 \label{fig:foo}
 \end{figure}
 \paragraph{Abbiamo la proporzionalità data dal PD, un polo dato dal LPF ed infine l'integratore che rappresenta il VCO. Possiamo calcolare le funzioni di trasferimento, sia ad anello aperto, sia ad anello chiuso ottenendo:\\$H_{0}(s)=K_{PD}\frac{1}{1+\frac{s}{\omega _{LPF}}}\frac{K_{VCO}}{s}$   e   $H(s)=\frac{K_{PD}K_{VCO}}{\frac{s^{2}}{\omega_{LPF}}}+s+K_{PD}K_{VCO}$}
 \paragraph{Quanto detto fin'ora però presenta un problema: abbiamo\\ $\omega_{LPF}<<\omega_{IN}-\omega_{OUT}$, pertanto la differenza non riesce a passare nel LPF e il circuito non riesce ad agganciarsi. Per il nostro progetto quindi avremmo bisogno di un rivelatore che non tenga conto solo della fase ma anche della frequenza: PFD (Phase-Frequency Detector, Figura 5).}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.4]{PFD2.png} 
 \centering
 \caption{Schema di un PFD}
@@ -71,14 +75,14 @@ Nell'istante $t_{0}$ la frequenza del segnale d'ingresso cambia, il periodo dell
 \paragraph{\\\\Se il fronte di salita del segnale $A$ arriva prima del fronte del segnale $B$, il segnale d'uscita $Q_A$ va a 1 fino a quando non arriva il fronte di B, quindi la larghezza dell'impulso di $Q_A$ è proporzionale alla differenza di fase tra i due segnali. Al contrario ovviamente se $B$ fosse in anticipo rispetto ad $A$, accadrebbe la medesima cosa però sul segnale $Q_B$.
 Questo dispositivo è stato implementato come si può vedere in Figura 6.
 }
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.6]{PFD.png} 
 \centering
 \caption{Realizzazione di un PFD}
 \label{fig:foo}
 \end{figure}
 \paragraph{A questo punto andiamo a realizzare un pompa di carico da aggiungere in cascata al PFD}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.6]{CP.png} 
 \caption{Rappresentazione simbolica della Charge Pump}
 \label{fig:foo}
@@ -89,7 +93,7 @@ L'uscita $Q_B$ invece fa scaricare lievemente il condensatore, in quanto gli imp
 \paragraph{Questa presenta due poli immaginari nell'origine, rendendo così il sistema instabile. A questo punto per ovviare a questo problema si deve  aggiungere uno zero in zero alla funzione di trasferimento, aggiungendo un resistore prima del condensatore.
 Il fattore di smorzamento diventa \textgreater 0 , il margine di fase, che in precedenza era nullo, ora è aumentato.  
 Questo non è l'unico aspetto positivo di questa realizzazione, perché anche all'aumentare del guadagno, vediamo che il margine di fase aumenta ulteriormente di conseguenza (Figura 8), migliorando la stabilità.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.8]{ZPFD.png} 
 \caption{Il margine di fase aumenta}
 \label{fig:foo}
@@ -97,16 +101,16 @@ Questo non è l'unico aspetto positivo di questa realizzazione, perché anche al
 \paragraph{Nella Figura 7 possiamo vedere che sarebbero necessari due generatori di corrente(ideali).
 Ovviamente non possiamo avere dei generatori ideali, quindi approssimeremo i due generatori come due generatori reali, quindi con una $r_p$ in parallelo al generatore, che possiamo trasformarlo in un equivalente Thevenin quindi con la $r_p$ in serie.
 A questo punto possiamo utilizzare due buffer Tristate, uno con ingresso a 1, l'altro con l'ingresso a 0. Collegando le due uscite $Q_A e Q_B$ del PFD agli input enable dei due buffer, avremo una approssimazione dei nostri due generatori (Figura 9). In serie alle due uscite dei buffer andremo poi ad inserire due resistenze $R_{P1}$ e  $R_{P2}$ che sarebbero quelle dei generatori reali.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.8]{CPDeeds.png} 
 \centering
-\caption{Realizzazione su Deeds dei due generatori di corrente}
+\caption{Realizzazione su Deeds dei due generatori di corrente fittizi}
 \label{fig:foo}
 \end{figure}
 \paragraph{Il segnale $CP1$ e $CP2$ sono le uscite effettive della pompa di carico che andranno sul LPF, mentre le due uscite LED0 e LED1 sono state inserite per vedere i led della FPGA quando il nostro sistema sta modificando la frequenza di oscillazione. Ci sono infinite soluzioni per dimensionare i componenti necessari in questo blocco del nostro sistema, in questo caso $R_{P1}$ e  $R_{P2}$ sono state scelte pari a $27k\Omega$ quindi le correnti che scorrono nei due rami sono $I_1=I_2=\frac{V_{DD}-V{CONT}}{R_{P1}}$ essendo $V{CONT}=V_{DD}/2$ $I_1=I_2=60\mu A$. A questo punto dovremmo scegliere una $R_1$ (quella del LPF) di valore significativamente più bassa delle due appena scelte, pertanto scegliamo $R_1=\frac{R_{P1}}{10}=2.7k\Omega$.
 Per dimensionare $C_1$ andremo a prendere la formula del fattore di smorzamento $\zeta$ che vedremo in seguito, dopo aver aggiunto il divisore per M, e lo porremo uguale a 0.8/1 che ci porterà alla stabilità del sistema. }
 \paragraph{A questo punto possiamo inserire un divisore di frequenza.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.6]{DivM.png} 
 \caption{PLL con pompa di carico e divisore per M}
 \label{fig:foo}
@@ -118,7 +122,7 @@ Ponendo $\zeta \approx0.94$ otteniamo una capacità $C_1=1\mu F$  }
 
 \paragraph{Per il nostro progetto dovremo tenere conto delle richieste che sono:\\$f_{OUT}=1 MHz$\\$f_{REF}=10 kHz$\\$M=100 (80\div150)$.\\Il VCO che utilizzeremo sarà il 74LS624, sono presenti due alimentazioni separate, una per la parte logica ed una per la parte di oscillazione, perché il costruttore ci dice che per frequenze \textgreater 10MHz è consigliato l'utilizzo di alimentazioni separate, in modo tale che i rumori proveniente dalla parte logica non influiscano sulla frequenza di oscillazione, infatti se la tensione di alimentazione avesse delle lievi oscillazioni la frequenza di lavoro cambierebbe.
 Tuttavia, nel nostro caso, utilizzeremo una singola alimentazione.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=1]{74LS.png} 
 \centering
 \caption{Pinout del VCO}
@@ -126,7 +130,7 @@ Tuttavia, nel nostro caso, utilizzeremo una singola alimentazione.}
 \end{figure}
 \paragraph{Come si diceva prima, si vedono infatti i pin delle due alimentazioni separate(1-14, 7-9), il piedino di enable, nel nostro caso, lo lasciamo sempre collegato a GND per farlo lavorare ogni volta che il VCO è alimentato.
 Il piedino 13 è quello di ingresso della tensione di controllo che proviene da un buffer, il motivo per cui è stato inserito un buffer tra il LPF e il VCO è che dal piedino di input ci sono delle resistenze che potrebbero costituire un carico non trascurabile, pertanto inserendo un buffer realizzato con un amplificatore operazionale andremo ad ovviare a questo problema.\\I pin 3 e 4 sono per una capacità esterna che noi abbiamo preso $C_{EXT}=120pF$.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.4]{SCH.png} 
 \centering
 \caption{Schema a blocchi dei dispositivi da realizzare.}
@@ -134,7 +138,7 @@ Il piedino 13 è quello di ingresso della tensione di controllo che proviene da 
 \end{figure}
 \paragraph{Il divisore per M, realizzato sull'FPGA, presenterà 8 dip switches per selezionare il numero M. Essi verranno collegati a due array di resistenze, quando uno singolo switch sarà ON, l'ingresso sulla FPGA verrà visto come basso, perché collegato a massa(attraverso le due resistenze), mentre, se lo switch è su OFF, l'ingresso della FPGA vede il valore logico alto (3.3V).}
 \paragraph{A questo punto l'uscita del VCO avrà un'uscita massima \textgreater 4V e dobbiamo portarlo in un range tale da poterlo usare come ingresso al divisore, quindi alla FPGA, per cui dobbiamo utilizzare un Level Shifter per portarlo a 3.3V.}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.7]{Level.png} 
 \centering
 \caption{Level Shifter}
@@ -142,7 +146,7 @@ Il piedino 13 è quello di ingresso della tensione di controllo che proviene da 
 \end{figure}
 \paragraph{Lo scopo di questo blocco è quindi quello di traslare il livello logico 1 dal valore che ci dava il VCO (\textgreater 4V) a 3.3V, mediante l'utilizzo di un transistore NPN 2N2222 (o similare), la resistenza di pull-up è stata scelta da $1.5k\Omega$ e quella in serie all'ingresso è stata presa da $15k\Omega$.\\
 Lo schema a blocchi completo di ogni componente è quindi il seguente:}
-~\begin{figure}[!h]%Risposta al gradino
+~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.4]{PLL_1.png} 
 \centering
 \caption{Schema a blocchi completo}
@@ -155,19 +159,21 @@ Lo schema a blocchi completo di ogni componente è quindi il seguente:}
 La realizzazione pratica è quindi suddivisa in due step, il primo su Deeds ed il secondo su breadboard.
 \subsection{Parte su Deeds}
 \paragraph{La prima cosa fatta per realizzare il sintetizzatore è stata partire dall'implementare sul Digital Electronics Deeds tutte le componenti che dovranno poi essere messe sulla FPGA Cyclone II.}
-~\begin{figure}[!h]%Risposta al gradino
-\includegraphics[scale=4.4]{Fig_Finale.png} 
+
+~\begin{figure}[H]%Risposta al gradino
+\includegraphics[scale=7]{Fig_Finale.png} 
 \centering
 \caption{Schema realizzato su Deeds}
 \label{fig:foo}
 \end{figure}
+\newpage
 \paragraph{In azzurro c'è il rilevatore di frequenza e fase, le cui uscite vanno alla pompa di carica (in verde).\\In Giallo e in rosso possiamo vedere i due divisori, realizzati con due contatori.
 A sinistra c'è il divisore per mille, realizzato caricando il numero $000111110011$ ovvero 499, siccome conta fino a zero, impiegano 500 cicli di clock per arrivare a zero, il filp-flop JK nella configurazione in figura ha il compito di dividere ulteriormente a metà la frequenza, ottenendo così il desiderato divisore per mille.\\
 Con lo stesso principio, in rosso, abbiamo il divisore per M variabile, il numero M viene scelto mediante gli switch in alto.
 L'ingresso di entrambi i divisori è ovviamente l'uscita del level shifter realizzato su breadboard come spiegato nel capitolo precedente.\\L'uscita finale è l'uscita Q del Flip Flop JK e il clock in alto a sinistra è la frequenza di riferimento.\\Mediante il software Quartus II, il progetto è stato esportato sulla FPGA, assegnando ad ogni Ingresso/uscita utile un suo pin da collegare poi alla breadboard.}
  \subsection{Parte su bread-board}
  \paragraph{Per il nostro progetto c'era bisogno di interfacciare la parte software con quella hardware, come detto prima sono stati assegnati i pin della FPGA nel modo seguente:}
- ~\begin{figure}[!h]%Risposta al gradino
+ ~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.6]{PinDeeds.png} 
 \centering
 \caption{Assegnazione dei pin}
@@ -175,14 +181,14 @@ L'ingresso di entrambi i divisori è ovviamente l'uscita del level shifter reali
 \end{figure}
 \paragraph{Il clear è stato messo sul push button della FPGA, i PIN dal 48 al 70 sono stati usati per collegare i dip switches alla FPGA, e l'uscita del level shifter (che andrà ai due divisori) è stato assegnato al pin 142. Su ogni componente sono stati messi dei condensatori di bypass sulle alimentazioni per ridurre al minimo le oscillazioni che la tensione di alimentazione potrebbe avere.
 Lo schema del circuito realizzato su breadboard è il seguente:}
- ~\begin{figure}[!h]%Risposta al gradino
+ ~\begin{figure}[H]%Risposta al gradino
 \includegraphics[scale=0.35]{SchemaCirc.png} 
 \centering
 \caption{Schema circuitale realizzato}
 \label{fig:foo}
 \end{figure}
 
- ~\begin{figure}[!h]%Risposta al gradino
+ ~\begin{figure}[h]%Risposta al gradino
 \includegraphics[scale=0.3]{Circuito.png} 
 \centering
 \caption{Realizzazione Pratica}
@@ -242,5 +248,8 @@ Si è utilizzato il software SoundScope per visualizzare a schermo l'onda d'usci
 \begin{itemize}
 \item Design of CMOS Phase-Locked Loops - B. Razavi
 \item RF Microelectronics - B. Razavi
+\item SoundCard Scope - $https://www.zeitnitz.eu/scope_en$
+\item Digital Electronics Deeds - $https://www.digitalelectronicsdeeds.com/$
+
 \end{itemize}
 \end{document}

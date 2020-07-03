@@ -36,7 +36,13 @@ Un oscillatore (sinusoidale) è caratterizzato da:
 \item purezza spettrale
 \item contenuto armonico
 \end{itemize}
-In seguito andremo ad analizzare ogni singolo punto della lista in particolar modo riferiti all'oscillatore di Collpits.
+In seguito andremo ad analizzare ogni singolo punto della lista in particolar modo riferiti all'oscillatore di Collpits.\\
+Le specifiche richieste per questo progetto sono:
+\begin{itemize}
+\item Frequenza di oscillazione pari a 5MHz
+\item THD inferiore a 1%
+\item Intervallo di sintonia pari a 100kHz
+\end{itemize}
 \newpage
 \section{Descrizione del Progetto}
 \subsection{La frequenza di oscillazione}
@@ -193,7 +199,7 @@ Dopo il primo transitorio e quando la tensione sulla base è sufficiente per inn
 \end{figure}
 
 A questo punto dovremmo tenere conto del fatto che il diodo in regime dinamico introduce una capacità in funzione della sua polarizzazione inversa.\\
-Sapendo che:\\  \LARGE$\bm{Z_C=\frac{1}{j \omega C}=\frac{V}{I} \rightarrow C=\frac{\bar{I}}{\omega \bar{V}}}$ possiamo simulare in frequenza come si comporta un diodo(nel nostro caso abbiamo simulato un D1N4148 $https://www.vishay.com/docs/81857/1n4148.pdf$)
+Sapendo che:\\  \LARGE$\bm{Z_C=\frac{1}{j \omega C}=\frac{V}{I} \rightarrow C=\frac{\bar{I}}{\omega \bar{V}}}$ \normalsize possiamo simulare in frequenza come si comporta un diodo(nel nostro caso abbiamo simulato un D1N4148 $https://www.vishay.com/docs/81857/1n4148.pdf$)
 ~\begin{figure}[H]
 \includegraphics[width=\textwidth]{D1N4148.png}
 \centering
@@ -215,14 +221,42 @@ Alla luce di questi nuovi punti, possiamo andare a modificare ed ultimare il nos
 \caption{Realizzazione finale dell'oscillatore}
 \label{fig:foo}
 \end{figure}
-Nel blocco verde chiaro notiamo che ci sono 3 blocchetti in parallelo, per cercare di avere una capacità un po' più grande e poter agire sulle frequenze che ci interessano.
+Nel blocco verde chiaro notiamo che ci sono 3 blocchetti in parallelo per cercare di avere una capacità un po' più grande e poter quindi agire sulle frequenze che ci interessano, considerando che le specifiche ci richiedono una banda di sintonia pari al 2\%(100kHz) della frequenza di oscillazione.
 Anche alla polarizzazione massima ho comunque una capacità di almeno 10pF dovuti  a C9, C11 e C14 che presentano una capacità costante.
 Abbiamo creato una rete di polarizzazione, rettangolo fucsia, la R è elevata per non influire sul Q del risonatore.
 Abbiamo inserito una capacità di sintonia(rettangolo blu), divisa in due in modo tale che quel nodo non influenzi il circuito.
 La C2 in precedenza era 100pF, dividendola in due avremmo ottenuto 50pF, tuttavia per mantenere costante la frequenza è stato necessario raddoppiare l'induttanza(20uH) che provoca un aumento della resistenza serie.
-Il rapporto \LARGE$\bm{\frac{L}{R_s}}$ determina il Q e la resistenza parallelo equivalente dipende da $Q^2$.
+Il rapporto \LARGE$\bm{\frac{L}{R_s}}$ \normalsize determina il Q e la resistenza parallelo equivalente dipende da $Q^2$.
 Se non avessi raddoppiato $R_s=R12$, avrei avuto un $R_p$ quadruplicata, con una conseguente rischio di instabilità.
+Per risolvere questo problema sono state inserite quindi C8 e C2 pari rispettivamente a 150pF e 58pF per fare in modo che la tensione sui varactor sia abbastanza bassa da non farli polarizzare direttamente, dato che la loro peculiarità di introdurre una capacità nel circuito è data dalla polarizzazione inversa.\\Dalla figura 13 vediamo che il varactor introduce, nel range $1V \div 5V$ una capacità $18pF \div 5pF$, avendone 3 in parallelo avremo un intervallo che va dai 54pF ai 15pF, ricordando inoltre le 3 capacità fisse abbiamo un intervallo $25pF \div 64pF$.
+A questo punto possiamo simulare su PSpice il circuito così ottenuto(figura 14), parametrizzando la tensione di controllo da 1 a 5V ed otteniamo:
+~\begin{figure}[H]
+\includegraphics[width=\textwidth]{AnalisiSpettraleFinale.png}
+\centering
+\caption{Analisi Spettrale dell'oscillatore}
+\label{fig:foo}
+\end{figure}
+Sotto 1V non possiamo scendere per evitare di polarizzare direttamente i varactor, che porterebbe un abbassamento del fattore Q ed una distorsione causato dal carico non simmetrico sulle due semionde.\\Possiamo procedere alla simulazione anche su LTSpice($https://www.analog.com/en/design-center/design-tools-and-calculators/ltspice-simulator.html$), il circuito è il medesimo di prima e possiamo andare a leggere la Total Harmonic Distorsion del nostro oscillatore:
+~\begin{figure}[H]
+\includegraphics[width=\textwidth]{THDLT.png}
+\centering
+\caption{THD calcolata da LTSpice}
+\label{fig:foo}
+\end{figure}
+Possiamo vedere una THD più che accettabile, pari al 0.51\%.
+Ci rimane da progettare uno stadio d'uscita per non influenzare eccessivamente il fattore Q dell'oscillatore, dobbiamo cercare un operazionale abbastanza veloce(slew-rate).
+$V_{OUT}=V_m * \sin(\omega t) $\\$\frac{dV_{OUT}}{dt}=\omega V_m \cos(\omega t)$\\$V_m=2V$ da specifica(vorrei una tensione di 1V sul carico, e stiamo ipotizzando una resistenza di carico $R_L$ pari a $50\Omega$ e una impedenza interna pari anch'essa a $50\Omega$).
+La pendenza massima di una sinusoide ce l'ho all'intersezione con l'asse orizzontale, infatti la sua derivata è il coseno ed in quel punto vale 1.
+La pendenza massima quindi è pari a $2 \pi f V_m=4\pi * 5 *10^6=63*10^6=63\frac{V}{\mu s}$.
+A questo punto è possibile andare sul sito di un qualsiasi rivenditore di componenti e scegliere un amplificatore operazionale che rispetti questa caratteristica, nel nostro caso abbiamo usato $www.digikey.it$, filtrando in base allo slew-rate,all'impedenza d'ingresso alta, per evitare di influenzare il resto del circuito $\rightarrow$ corrente di polarizzazione bassa, larghezza di banda minima possiamo scegliere 100MHz, abbiamo tutti che soddisfano le nostre esigenze, ad esempio AD8091($https://www.analog.com/media/en/technical-documentation/data-sheets/AD8091_8092.pdf$).
+~\begin{figure}[H]
+\includegraphics[width=\textwidth]{CircuitoConBuffer}
+\centering
+\caption{Circuito con lo stadio di uscita}
+\label{fig:foo}
+\end{figure}
 
+%%%%Devo concludere con 1:57 ultimo video
 \newpage
 \section{Realizzazione}
 
@@ -240,5 +274,9 @@ Se non avessi raddoppiato $R_s=R12$, avrei avuto un $R_p$ quadruplicata, con una
 \item The Design of CMOS Radio-Frequency Integrated Circuits - Thomas H. Lee
 \item RF Microeletronics - B. Razavi
 \item D1N4148 - $https://www.vishay.com/docs/81857/1n4148.pdf$
+\item PSpice
+\item LTSpice - $https://www.analog.com/en/design-center/design-tools-and-calculators/ltspice-simulator.html$
+\item $https://www.analog.com/media/en/technical-documentation/data-sheets/AD8091_8092.pdf$
+\item $www.digikey.it$
 \end{itemize}
 \end{document}

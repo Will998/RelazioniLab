@@ -13,6 +13,7 @@
 \title{Oscillatore di Collpits}
 \author{William Perri 4427140 }
 \setlength{\parskip}{1em}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
 \renewcommand{\baselinestretch}{1.2}
 %\DeclareGraphicsExtensions{.jpeg,.png}
 \date{27/06/2020}
@@ -20,7 +21,7 @@
 \begin{document}
 
 \maketitle
-Insegnamento di LABORATORIO DI ELETTRONICA A.A. 2019/20
+\tab \tab \tab Insegnamento di LABORATORIO DI ELETTRONICA A.A. 2019/20
 
 \newpage
 \tableofcontents
@@ -44,7 +45,7 @@ Le specifiche richieste per questo progetto sono:
 \item Intervallo di sintonia pari a 100kHz
 \end{itemize}
 \newpage
-\section{Descrizione del Progetto}
+\section{Descrizione e Realizzazione del Progetto}
 \subsection{La frequenza di oscillazione}
 ~\begin{figure}[H]
 \includegraphics[scale=2]{RisonatoreParallelo.png} 
@@ -229,6 +230,9 @@ La C2 in precedenza era 100pF, dividendola in due avremmo ottenuto 50pF, tuttavi
 Il rapporto \LARGE$\bm{\frac{L}{R_s}}$ \normalsize determina il Q e la resistenza parallelo equivalente dipende da $Q^2$.
 Se non avessi raddoppiato $R_s=R12$, avrei avuto un $R_p$ quadruplicata, con una conseguente rischio di instabilità.
 Per risolvere questo problema sono state inserite quindi C8 e C2 pari rispettivamente a 150pF e 58pF per fare in modo che la tensione sui varactor sia abbastanza bassa da non farli polarizzare direttamente, dato che la loro peculiarità di introdurre una capacità nel circuito è data dalla polarizzazione inversa.\\Dalla figura 13 vediamo che il varactor introduce, nel range $1V \div 5V$ una capacità $18pF \div 5pF$, avendone 3 in parallelo avremo un intervallo che va dai 54pF ai 15pF, ricordando inoltre le 3 capacità fisse abbiamo un intervallo $25pF \div 64pF$.
+
+\newpage
+\section{Risultati}
 A questo punto possiamo simulare su PSpice il circuito così ottenuto(figura 14), parametrizzando la tensione di controllo da 1 a 5V ed otteniamo:
 ~\begin{figure}[H]
 \includegraphics[width=\textwidth]{AnalisiSpettraleFinale.png}
@@ -248,21 +252,22 @@ Ci rimane da progettare uno stadio d'uscita per non influenzare eccessivamente i
 $V_{OUT}=V_m * \sin(\omega t) $\\$\frac{dV_{OUT}}{dt}=\omega V_m \cos(\omega t)$\\$V_m=2V$ da specifica(vorrei una tensione di 1V sul carico, e stiamo ipotizzando una resistenza di carico $R_L$ pari a $50\Omega$ e una impedenza interna pari anch'essa a $50\Omega$).
 La pendenza massima di una sinusoide ce l'ho all'intersezione con l'asse orizzontale, infatti la sua derivata è il coseno ed in quel punto vale 1.
 La pendenza massima quindi è pari a $2 \pi f V_m=4\pi * 5 *10^6=63*10^6=63\frac{V}{\mu s}$.
-A questo punto è possibile andare sul sito di un qualsiasi rivenditore di componenti e scegliere un amplificatore operazionale che rispetti questa caratteristica, nel nostro caso abbiamo usato $www.digikey.it$, filtrando in base allo slew-rate,all'impedenza d'ingresso alta, per evitare di influenzare il resto del circuito $\rightarrow$ corrente di polarizzazione bassa, larghezza di banda minima possiamo scegliere 100MHz, abbiamo tutti che soddisfano le nostre esigenze, ad esempio AD8091($https://www.analog.com/media/en/technical-documentation/data-sheets/AD8091_8092.pdf$).
+A questo punto è possibile andare sul sito di un qualsiasi rivenditore di componenti e scegliere un amplificatore operazionale che rispetti questa caratteristica, nel nostro caso abbiamo usato $www.digikey.it$, filtrando in base allo slew-rate,all'impedenza d'ingresso alta, per evitare di influenzare il resto del circuito $\rightarrow$ corrente di polarizzazione bassa, larghezza di banda minima possiamo scegliere 100MHz, abbiamo tutti che soddisfano le nostre esigenze, ad esempio AD8091($https://www.analog.com/media/en/technical-documentation/data-sheets/AD8091_8092.pdf$).\\
+Avendo in uscita una tensione di picco di 450mV(visto prima in simulazione), sappiamo che dobbiamo portarla a 2V(da richiesta), lo stadio d'uscita dovrà avere un guadagno $A_v=\frac{2}{450*10^-3}\approx 4.5$, scegliamo di utilizzare l'operazionale implementando una configurazione non invertente, il cui guadagno è $A_v=1+\frac{R_2}{R_1}$, il condensatore C6 serve per accoppiare i due circuiti in alternata, C7 invece mi serve per amplificare solamente l'alternata e non la polarizzazione.\\La scelta delle resistenze è abbastanza arbitrale, scegliamo ad esempio 3.5k e 1k in modo che $A_v=1+\frac{3.5}{1}=4.5$.\\Per aumentare ulteriormente l'impedenza dello stadio d'uscita, e diminuire quindi l'influenza di questo sul Q dell'oscillatore, aggiungo un'induttanza L2, di valore elevato (Figura 17) collegato poi ai 2.5V del partitore resistivo, questo collegamento serve per "centrare" il valore medio della tensione d'uscita a 2.5V.
 ~\begin{figure}[H]
 \includegraphics[width=\textwidth]{CircuitoConBuffer}
 \centering
 \caption{Circuito con lo stadio di uscita}
 \label{fig:foo}
 \end{figure}
-
-%%%%Devo concludere con 1:57 ultimo video
-\newpage
-\section{Realizzazione}
-
-\newpage
-\section{Risultati}
-
+In uscita vediamo un nuovo condensatore C8, con lo scopo sempre di accoppiare in alternata, e le due resistenze di cui si era già parlato in precedenza $R_source$ e $R_{LOAD}$.\\Simulando il nuovo circuito otteniamo quanto segue:
+~\begin{figure}[H]
+\includegraphics[width=\textwidth]{SimulazioneFinaleTempo}
+\centering
+\caption{Circuito con lo stadio di uscita}
+\label{fig:foo}
+\end{figure}
+Se andiamo a calcolare la THD vediamo che rispetta la specifica assestandosi su un valore di $ \approx 0.53\% $
 \newpage
 
 \section{Conclusioni}
@@ -274,7 +279,7 @@ A questo punto è possibile andare sul sito di un qualsiasi rivenditore di compo
 \item The Design of CMOS Radio-Frequency Integrated Circuits - Thomas H. Lee
 \item RF Microeletronics - B. Razavi
 \item D1N4148 - $https://www.vishay.com/docs/81857/1n4148.pdf$
-\item PSpice
+\item PSpice - $https://www.pspice.com/$
 \item LTSpice - $https://www.analog.com/en/design-center/design-tools-and-calculators/ltspice-simulator.html$
 \item $https://www.analog.com/media/en/technical-documentation/data-sheets/AD8091_8092.pdf$
 \item $www.digikey.it$
